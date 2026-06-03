@@ -6,7 +6,7 @@ class CreateService
 {
     public string? Name { get; set; }
 
-    public void Create()
+    public async Task CreateAsync()
     {
         switch(Name)
         {
@@ -16,8 +16,8 @@ class CreateService
                     ConsoleError("No arguments provided for patchnotes creation.");
                     return;
                 }
-                Console.WriteLine("Creating patchnotes...");
-                new Patchnotes(Program.Args);
+                var patchnotes = new Patchnotes(Program.Args);
+                await patchnotes.CreateAsync();
                 break;
             default:
                 ConsoleWarning($"Unknown create target: {Name}");

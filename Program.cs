@@ -7,17 +7,17 @@ class Program
 {
     public static string[]? Args { get; set; }
 
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
         if(args.Length > 0)
         {
             Args = args;
-            showArgs(Args);
+            await showArgs(Args);
         }
     }
 
-    static void showArgs(string[] args)
+    static async Task showArgs(string[] args)
     {
         Console.WriteLine("Arguments:");
         int i = 0;
@@ -31,7 +31,7 @@ class Program
             case "create":
                 var createService = new CreateService();
                 createService.Name = args.Length > 1 ? args[1] : "";
-                createService.Create();
+                await createService.CreateAsync();
                 break;
             default:
                 Console.WriteLine($"Unknown command: {args[0]}");
