@@ -1,5 +1,6 @@
 namespace DevCli;
 
+using System.Diagnostics;
 using DevCli.Service;
 
 class Patchnotes
@@ -8,8 +9,12 @@ class Patchnotes
     public string? diff { get; set; }
     private const string PROMT = @$"
         Create patchnotes for my repository. 
+        The patchnotes should be in markdown format and should be concise and informative.
         Use following information to create the patchnotes (this is data from a git diff):
     ";
+    // private const string PROMT = @$"
+    //     Write exactly one word: Hello
+    // ";
 
     public Patchnotes(string[] args)
     {
@@ -49,8 +54,66 @@ class Patchnotes
 
     private void CreateDiffWithGit()
     {
-        Console.WriteLine("Creating git diff...");
-        
+        Console.WriteLine("Creating git diff for repository: " + repository);
+        if(repository == null)
+        {
+            ConsoleError("Cannot create git diff without a valid repository.");
+            return;
+        }
+
+        // Get the newest tag
+        ProcessStartInfo gitNewestTagProcess = new ProcessStartInfo
+        {
+            FileName = "git",
+            Arguments = "describe --tags --abbrev=0",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = repository
+        };
+
+        using Process gitNewestTagProcessInstance = Process.Start(gitNewestTagProcess)!;
+
+        string gitNewestTag = gitNewestTagProcessInstance.StandardOutput.ReadToEnd().Trim();
+        string gitNewestTagError = gitNewestTagProcessInstance.StandardError.ReadToEnd();
+        gitNewestTagProcessInstance.WaitForExit();
+        if (!string.IsNullOrEmpty(gitNewestTagError))
+        {
+            ConsoleError(gitNewestTagError);
+        }
+        else
+        {
+            ConsoleLog($"Newest git tag found: {gitNewestTag}");
+        }
+
+        // Create diff file
+        ProcessStartInfo gitDiffProcess = new ProcessStartInfo
+        {
+            FileName = "git",
+            Arguments = $"diff {gitNewestTag}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = repository
+        };
+
+        using Process gitDiffProcessInstance = Process.Start(gitDiffProcess)!;
+        string gitDiffOutput = gitDiffProcessInstance.StandardOutput.ReadToEnd();
+        string gitDiffError = gitDiffProcessInstance.StandardError.ReadToEnd();
+        if (!string.IsNullOrEmpty(gitDiffError))
+        {
+            ConsoleError(gitDiffError);
+        }
+        gitDiffProcessInstance.WaitForExit();
+
+        File.WriteAllText(
+            Path.Combine(repository, "diff.txt"),
+            gitDiffOutput
+        );
+
+        diff = File.ReadAllText(Path.Combine(repository, "diff.txt"));
     }
 
     public async Task CreateAsync()
@@ -74,8 +137,18 @@ class Patchnotes
         Console.WriteLine("Patchnotes creation logic goes here.");
         Console.ResetColor();
 
+        if (string.IsNullOrWhiteSpace(diff))
+        {
+            ConsoleError("Cannot create patchnotes because the git diff is empty.");
+            return;
+        }
+
         var ollamaService = new OllamaService();
-        string antwort = await ollamaService.GenerateAsync("say 'hello world'");
-        Console.WriteLine($"Ollama response: {antwort}");
+        string antwort = await ollamaService.GenerateAsync(PROMT, diff);
+        // Console.WriteLine($"Ollama response: {antwort}");
+        File.WriteAllText(
+            Path.Combine(repository!, "patchnotes.md"),
+            antwort
+        );
     }
 }

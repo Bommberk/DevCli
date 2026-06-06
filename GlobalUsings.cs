@@ -1,1 +1,1 @@
-global using static DevCli.Service.GlobalService;
+global using static DevCli.Functions.GlobalFunctions;
