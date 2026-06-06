@@ -26,7 +26,7 @@ class Patchnotes
         // Create diff with git
         CreateDiffWithGit();
         // Update prompt with markdown template
-        promtMarkdown = promtMarkdown + "\n" + File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "patchnotes-prompt.md"));
+        promtMarkdown = promtMarkdown + "\n" + File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "patchnotes-prompt.md"));
         fullPrompt = PROMT + "\n" + promtMarkdown + "\n" + diff;
     }
 
