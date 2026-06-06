@@ -9,23 +9,19 @@ class Program
 
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
         if(args.Length > 0)
         {
             Args = args;
             await showArgs(Args);
         }
+        else
+        {
+            Console.WriteLine("DevCli - A CLI tool for developers");
+        }
     }
 
     static async Task showArgs(string[] args)
     {
-        Console.WriteLine("Arguments:");
-        int i = 0;
-        foreach(var arg in args)
-        {
-            Console.WriteLine($"{i}: {arg}");
-            i++;
-        }
         switch(args[0])
         {
             case "create":

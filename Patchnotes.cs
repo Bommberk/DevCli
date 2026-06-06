@@ -86,7 +86,7 @@ class Patchnotes
         gitNewestTagProcessInstance.WaitForExit();
         if (!string.IsNullOrEmpty(gitNewestTagError))
         {
-            ConsoleError(gitNewestTagError);
+            die(gitNewestTagError);
         }
         else
         {
@@ -110,7 +110,7 @@ class Patchnotes
         string gitDiffError = gitDiffProcessInstance.StandardError.ReadToEnd();
         if (!string.IsNullOrEmpty(gitDiffError))
         {
-            ConsoleError(gitDiffError);
+            die(gitDiffError);
         }
         gitDiffProcessInstance.WaitForExit();
 
