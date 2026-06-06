@@ -6,6 +6,7 @@ namespace DevCli.Service;
 public class OllamaService
 {
     private readonly HttpClient _httpClient;
+    private const int MAX_PROMPT_TOKENS = 32768;
 
     public OllamaService()
     {
@@ -18,7 +19,7 @@ public class OllamaService
             ? prompt
             : $"{prompt}\n\n{input}";
 
-        ConsoleWarning($"full Promt lenght: {fullPrompt.Length}");
+        ConsoleWarning($"full Prompt length: {fullPrompt.Length}");
 
         var request = new
         {
@@ -28,7 +29,7 @@ public class OllamaService
             think = false,
             options = new
             {
-                num_ctx = 32768,
+                num_ctx = MAX_PROMPT_TOKENS,
                 num_predict = 2048
             }
         };
@@ -63,6 +64,8 @@ public class OllamaService
         Console.ForegroundColor = ConsoleColor.White;
         ConsoleLog($"Response Length: {response.Response.Length}");
         ConsoleLog($"Prompt Tokens: {response.PromptEvalCount}");
+        ConsoleLog($"Context Size: {MAX_PROMPT_TOKENS}");
+        ConsoleLog($"Usage: {response.PromptEvalCount * 100 / MAX_PROMPT_TOKENS}%");
         ConsoleLog($"Generated Tokens: {response.EvalCount}");
         ConsoleLog($"Done Reason: {response.DoneReason}");
         Console.ResetColor();

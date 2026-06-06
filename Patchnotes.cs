@@ -6,15 +6,18 @@ using DevCli.Service;
 class Patchnotes
 {
     public string? repository { get; set; }
-    public string? diff { get; set; }
     private const string PROMT = @$"
         Create patchnotes for my repository. 
         The patchnotes should be in markdown format and should be concise and informative.
+    ";
+    private string promtMarkdown = @"
+        Use the following patchnotes for example how the patchnotes should be structured:
+    ";
+    public string diff = @"
         Use following information to create the patchnotes (this is data from a git diff):
     ";
-    // private const string PROMT = @$"
-    //     Write exactly one word: Hello
-    // ";
+
+    private string fullPrompt;
 
     public Patchnotes(string[] args)
     {
@@ -22,6 +25,9 @@ class Patchnotes
         SetRepoPath(args);
         // Create diff with git
         CreateDiffWithGit();
+        // Update prompt with markdown template
+        promtMarkdown = promtMarkdown + "\n" + File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "patchnotes-prompt.md"));
+        fullPrompt = PROMT + "\n" + promtMarkdown + "\n" + diff;
     }
 
     private void SetRepoPath(string[] args)
@@ -113,7 +119,7 @@ class Patchnotes
             gitDiffOutput
         );
 
-        diff = File.ReadAllText(Path.Combine(repository, "diff.txt"));
+        diff = diff + "\n" + File.ReadAllText(Path.Combine(repository, "diff.txt"));
     }
 
     public async Task CreateAsync()
@@ -144,7 +150,7 @@ class Patchnotes
         }
 
         var ollamaService = new OllamaService();
-        string antwort = await ollamaService.GenerateAsync(PROMT, diff);
+        string antwort = await ollamaService.GenerateAsync(fullPrompt);
         // Console.WriteLine($"Ollama response: {antwort}");
         File.WriteAllText(
             Path.Combine(repository!, "patchnotes.md"),

@@ -1,27 +1,12 @@
-# 🚀 Development CLI – Patch Notes ([Version Tag])
+# Changelog
 
-> **Release Type:** Major Infrastructure & AI Integration Update
+### 🧹 Code Hygiene & Refactoring
+- **Variable Management:** Introduced `MAX_PROMPT_TOKENS` constant in `OllamaService.cs`, centralizing context limit configuration and removing hardcoded magic numbers.
+- **Naming Consistency:** Corrected typo in console warning messages ("Promt" → "Prompt") for improved code readability.
 
-We have completely overhauled the core service architecture to improve debugging workflows, enhance error handling for our LLM integrations, and add robust versioning support.
+### 🖥️ Enhanced Debugging & Logging (OllamaService)
+- **Context Transparency:** Added specific logging output for `Context Size` and token usage percentage during LLM inference to monitor resource consumption.
+- **Dynamic Configuration:** Updated Ollama request options to utilize the new configuration constant instead of static values, ensuring consistency across configurations.
 
-### ✨ New Features
-*   **🛠️ Enhanced `GlobalFunctions`:** Replaced legacy logging with a comprehensive utility suite.
-    *   Added typed loggers (`ConsoleLog`, `ConsoleError`, `ConsoleWarning`).
-    *   Introduced dynamic debug helpers: `slog()` (separator), `clog()` (call count tracker), and `mlog()` (custom messages).
-*   **🧐 Deep Debugging:** New object dumper functionality allows recursive inspection of complex objects with indentation support.
-*   **💾 File Utilities:** Added direct file writing capabilities (`writeFile`) to output logs or intermediate data directly to disk.
-
-### 🤖 AI Integration Improvements (Ollama Service)
-*   **Robust Error Handling:** Wrapped LLM calls in `try/catch` blocks to gracefully handle network failures and API errors, returning descriptive error messages instead of crashing the app.
-*   **Thinking Model Support:** Added support for "thinking" models via a new JSON property capture (`Thinking`).
-*   **Raw Response Logging:** Automatically saves raw AI responses to `ollama_raw_response.json` for analysis.
-*   **Input Concatenation Logic:** Improved prompt construction logic when additional input is provided alongside the base system prompt.
-
-### 🔧 Under-the-Hood & Fixes
-*   **Architecture Refactor:** Consolidated logging and utility classes into a new dedicated namespace (`DevCli.Functions`) to avoid polluting global scopes unnecessarily.
-*   **Git Versioning Logic:** Implemented automatic detection of the latest Git tag using `git describe --tags`. The tool now generates diffs relative to this specific version anchor, ensuring accurate changelogs per release cycle.
-*   **Input Validation:** Added checks for empty git diff outputs and missing repository paths before attempting AI generation or file operations.
-
-### 📝 Developer Experience (DX)
-*   **Better CLI Feedback:** Console output now clearly distinguishes between success logs, warnings, and critical errors with color coding.
-*   **Safe Defaults:** `die()` method ensures immediate exit on fatal internal logic checks without requiring verbose messages every time.
+### 📦 Asset & Data Handling
+- **Prompt Construction:** Improved prompt building logic in `Patchnotes.cs` to correctly concatenate additional input with base prompts when provided.
