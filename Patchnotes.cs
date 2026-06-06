@@ -13,16 +13,18 @@ class Patchnotes
     private string promtMarkdown = @"
         Use the following patchnotes for example how the patchnotes should be structured:
     ";
-    public string diff = @"
+    private string diff = @"
         Use following information to create the patchnotes (this is data from a git diff):
     ";
+    private string? version = null;
 
     private string fullPrompt;
 
     public Patchnotes(string[] args)
     {
-        // Set repository path from arguments
+        // Set arguments
         SetRepoPath(args);
+        SetVersion(args);
         // Create diff with git
         CreateDiffWithGit();
         // Update prompt with markdown template
@@ -57,6 +59,25 @@ class Patchnotes
             return;
         }
     }
+    private void SetVersion(string[] args)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i] == "--version" || args[i] == "-v")
+            {
+                version = args[i + 1];
+                if (!version.StartsWith("v"))
+                {
+                    version = "v" + version;
+                }
+                break;
+            }
+        }
+        if(version != null)
+        {
+            fullPrompt = $"Create patchnotes for version {version}.\n" + fullPrompt;
+        }
+    }
 
     private void CreateDiffWithGit()
     {
@@ -67,30 +88,38 @@ class Patchnotes
             return;
         }
 
-        // Get the newest tag
-        ProcessStartInfo gitNewestTagProcess = new ProcessStartInfo
+        string gitNewestTag;
+        if(version == null)
         {
-            FileName = "git",
-            Arguments = "describe --tags --abbrev=0",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = repository
-        };
+            // Get the newest tag
+            ProcessStartInfo gitNewestTagProcess = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = "describe --tags --abbrev=0",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = repository
+            };
 
-        using Process gitNewestTagProcessInstance = Process.Start(gitNewestTagProcess)!;
+            using Process gitNewestTagProcessInstance = Process.Start(gitNewestTagProcess)!;
 
-        string gitNewestTag = gitNewestTagProcessInstance.StandardOutput.ReadToEnd().Trim();
-        string gitNewestTagError = gitNewestTagProcessInstance.StandardError.ReadToEnd();
-        gitNewestTagProcessInstance.WaitForExit();
-        if (!string.IsNullOrEmpty(gitNewestTagError))
-        {
-            die(gitNewestTagError);
+            gitNewestTag = gitNewestTagProcessInstance.StandardOutput.ReadToEnd().Trim();
+            string gitNewestTagError = gitNewestTagProcessInstance.StandardError.ReadToEnd();
+            gitNewestTagProcessInstance.WaitForExit();
+            if (!string.IsNullOrEmpty(gitNewestTagError))
+            {
+                die(gitNewestTagError);
+            }
+            else
+            {
+                ConsoleLog($"Newest git tag found: {gitNewestTag}");
+            }
         }
         else
         {
-            ConsoleLog($"Newest git tag found: {gitNewestTag}");
+            gitNewestTag = version;
         }
 
         // Create diff file
@@ -130,7 +159,6 @@ class Patchnotes
             return;
         }
 
-        Console.WriteLine($"Creating patchnotes for repository: {repository}");
         await CreatePatchnotes();
     }
 
@@ -140,7 +168,7 @@ class Patchnotes
     private async Task CreatePatchnotes()
     {
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("Patchnotes creation logic goes here.");
+        Console.WriteLine($"Creating patchnotes for repository");
         Console.ResetColor();
 
         if (string.IsNullOrWhiteSpace(diff))

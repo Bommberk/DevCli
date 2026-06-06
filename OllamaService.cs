@@ -44,7 +44,7 @@ public class OllamaService
 
             var result = await response.Content.ReadFromJsonAsync<OllamaResponse>();
             var rawResponse = await response.Content.ReadAsStringAsync();
-            writeFile("ollama_raw_response.json", rawResponse, true);
+            // writeFile("ollama_raw_response.json", rawResponse, true);
 
             if (result == null)
             {
