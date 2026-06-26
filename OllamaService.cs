@@ -6,7 +6,7 @@ namespace DevCli.Service;
 public class OllamaService
 {
     private readonly HttpClient _httpClient;
-    private const int MAX_PROMPT_TOKENS = 32768;
+    private const int MAX_PROMPT_TOKENS = 65536;
 
     public OllamaService()
     {
