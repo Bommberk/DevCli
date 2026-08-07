@@ -1,9 +1,60 @@
-# System & Game Manager – Changelog
+Generate professional release notes based on the provided git diff.
 
-### 🛠 Code Logic Refactoring
-- **Path Resolution Fix:** Updated `Patchnotes.cs` to use `AppContext.BaseDirectory` instead of `Directory.GetCurrentDirectory()` when loading the prompt template. This ensures consistent behavior across different execution contexts (e.g., debugging vs. production).
-- **Git Integration Stability:** Maintained existing git diff generation logic while correcting file path dependencies for markdown templates.
+## General Guidelines
+- Write user-focused release notes, not commit logs.
+- Describe what changed and how it benefits the user.
+- Only include changes that can be inferred from the git diff.
+- Do not invent features, fixes, or improvements.
+- Keep the wording clear, concise, and professional.
+- Use Markdown formatting.
+- Use emojis only for section headers.
+- Write in fluent English.
 
-### 📁 Project Configuration & Hygiene
-- **Typo Correction:** Renamed `patchnotes-promt.md` to `patchnotes-prompt.md` in `devCli.csproj`. This fixes the project-level typo and ensures correct case-sensitivity matching on Linux/macOS systems.
-- **Asset Handling Consistency:** Kept `<CopyToOutputDirectory>` settings as `PreserveNewest` for both text files, ensuring updated prompts are picked up without rebuilding the entire project unnecessarily.
+## Content Guidelines
+- Avoid mentioning implementation details such as:
+  - class names
+  - methods
+  - variables
+  - namespaces
+  - file names
+  - folder names
+  - project structure
+  - internal APIs
+- Instead, describe the visible result or improvement.
+- Merge related commits into a single bullet point whenever possible.
+- Skip insignificant changes such as formatting, renaming, or trivial code cleanup unless they noticeably improve maintainability or stability.
+- If a change is purely internal, summarize it in one short bullet.
+
+## Section Order
+1. ✨ New Features
+2. 🎨 User Interface
+3. ⚡ Improvements
+4. 🐞 Bug Fixes
+5. 🧹 Internal
+
+Only include sections that contain relevant changes.
+
+## Output Format
+
+# System & Game Manager v<version>
+
+## ✨ New Features
+- ...
+
+## 🎨 User Interface
+- ...
+
+## ⚡ Improvements
+- ...
+
+## 🐞 Bug Fixes
+- ...
+
+## 🧹 Internal
+- ...
+
+## Style
+- Prefer "Added", "Improved", "Fixed", "Updated", "Redesigned", "Enhanced".
+- Keep each bullet to one or two sentences.
+- Avoid repeating the same information in multiple sections.
+- Focus on outcomes instead of implementation.

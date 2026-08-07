@@ -6,13 +6,6 @@ using DevCli.Service;
 class Patchnotes
 {
     public string? repository { get; set; }
-    private const string PROMT = @$"
-        Create patchnotes for my repository. 
-        The patchnotes should be in markdown format and should be concise and informative.
-    ";
-    private string promtMarkdown = @"
-        Use the following patchnotes for example how the patchnotes should be structured:
-    ";
     private string diff = @"
         Use following information to create the patchnotes (this is data from a git diff):
     ";
@@ -28,8 +21,8 @@ class Patchnotes
         // Create diff with git
         CreateDiffWithGit();
         // Update prompt with markdown template
-        promtMarkdown = promtMarkdown + "\n" + File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "patchnotes-prompt.md"));
-        fullPrompt = PROMT + "\n" + promtMarkdown + "\n" + diff;
+        string promtMarkdown = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "patchnotes-prompt.md"));
+        fullPrompt = promtMarkdown + "\n" + diff;
     }
 
     private void SetRepoPath(string[] args)
