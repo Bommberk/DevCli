@@ -29,6 +29,10 @@ class Program
                 createService.Name = args.Length > 1 ? args[1] : "";
                 await createService.CreateAsync();
                 break;
+            case "commit":
+                var gitCommitService = new GitCommitService();
+                await gitCommitService.CommitAsync(args.Skip(1).ToArray());
+                break;
             default:
                 Console.WriteLine($"Unknown command: {args[0]}");
                 break;
