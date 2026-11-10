@@ -20,7 +20,7 @@ class GitCommitService
             return;
         }
 
-        if (args.Contains("-a", StringComparer.Ordinal))
+        if (args.Contains("--stage-all", StringComparer.Ordinal))
         {
             var addResult = await RunGitAsync(repository, "add", ".", "--", ":(exclude)patchnotes.md");
             if (addResult.ExitCode != 0)
