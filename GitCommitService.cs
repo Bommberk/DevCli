@@ -72,6 +72,12 @@ class GitCommitService
                 ConsoleError(pushResult.StandardError);
                 return;
             }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Push successful.");
+                Console.ResetColor();
+            }
         }
 
         Console.Write(commitResult.StandardOutput);
