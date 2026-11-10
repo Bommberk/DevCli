@@ -20,6 +20,16 @@ class GitCommitService
             return;
         }
 
+        if (args.Contains("-a", StringComparer.Ordinal))
+        {
+            var addResult = await RunGitAsync(repository, "add", ".");
+            if (addResult.ExitCode != 0)
+            {
+                ConsoleError(addResult.StandardError);
+                return;
+            }
+        }
+
         var diffResult = await RunGitAsync(repository, "diff", "--cached", "--no-ext-diff", "--");
         if (diffResult.ExitCode != 0)
         {
