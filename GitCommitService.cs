@@ -22,24 +22,12 @@ class GitCommitService
 
         if (args.Contains("--stage-all", StringComparer.Ordinal))
         {
-            var addResult = await RunGitAsync(repository, "add", ".", "--", ":(exclude)patchnotes.md");
+            var addResult = await RunGitAsync(repository, "add", ".");
             if (addResult.ExitCode != 0)
             {
                 ConsoleError(addResult.StandardError);
                 return;
             }
-        }
-
-        var patchnotesResult = await RunGitAsync(repository, "diff", "--cached", "--name-only", "--", "patchnotes.md");
-        if (patchnotesResult.ExitCode != 0)
-        {
-            ConsoleError(patchnotesResult.StandardError);
-            return;
-        }
-        if (!string.IsNullOrWhiteSpace(patchnotesResult.StandardOutput))
-        {
-            ConsoleError("patchnotes.md is excluded from smart commits. Unstage it before committing.");
-            return;
         }
 
         var diffResult = await RunGitAsync(repository, "diff", "--cached", "--no-ext-diff", "--");
@@ -74,6 +62,16 @@ class GitCommitService
         {
             ConsoleError(commitResult.StandardError);
             return;
+        }
+        
+        if (args.Contains("--push", StringComparer.Ordinal))
+        {
+            var pushResult = await RunGitAsync(repository, "push");
+            if (pushResult.ExitCode != 0)
+            {
+                ConsoleError(pushResult.StandardError);
+                return;
+            }
         }
 
         Console.Write(commitResult.StandardOutput);
