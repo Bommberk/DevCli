@@ -33,6 +33,10 @@ class Program
                 var gitCommitService = new GitCommitService();
                 await gitCommitService.CommitAsync(args.Skip(1).ToArray());
                 break;
+            case "push":
+                var gitPushService = new GitCommitService();
+                await gitPushService.CommitAsync(args.Skip(1).Append("--push").ToArray());
+                break;
             default:
                 Console.WriteLine($"Unknown command: {args[0]}");
                 break;
