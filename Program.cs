@@ -29,11 +29,11 @@ class Program
                 createService.Name = args.Length > 1 ? args[1] : "";
                 await createService.CreateAsync();
                 break;
-            case "commit":
+            case "gitcommit":
                 var gitCommitService = new GitCommitService();
                 await gitCommitService.CommitAsync(args.Skip(1).ToArray());
                 break;
-            case "push":
+            case "gitpush":
                 var gitPushService = new GitPushService();
                 await gitPushService.PushAsync(args.Skip(1).ToArray());
                 break;
