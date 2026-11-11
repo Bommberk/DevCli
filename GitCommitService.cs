@@ -5,19 +5,19 @@ namespace DevCli;
 
 class GitCommitService
 {
-    public async Task CommitAsync(string[] args)
+    public async Task<bool> CommitAsync(string[] args)
     {
         string? repository = GetRepositoryPath(args);
         if (repository == null)
         {
-            return;
+            return false;
         }
 
         var gitStatus = await RunGitAsync(repository, "rev-parse", "--is-inside-work-tree");
         if (gitStatus.ExitCode != 0)
         {
             ConsoleError($"Not a git repository: {repository}");
-            return;
+            return false;
         }
 
         if (args.Contains("--stage-all", StringComparer.Ordinal))
@@ -26,7 +26,7 @@ class GitCommitService
             if (addResult.ExitCode != 0)
             {
                 ConsoleError(addResult.StandardError);
-                return;
+                return false;
             }
         }
 
@@ -34,12 +34,12 @@ class GitCommitService
         if (diffResult.ExitCode != 0)
         {
             ConsoleError(diffResult.StandardError);
-            return;
+            return false;
         }
         if (string.IsNullOrWhiteSpace(diffResult.StandardOutput))
         {
             ConsoleWarning("No staged changes to commit.");
-            return;
+            return false;
         }
 
         const string prompt = "Write one short, clear commit message in English describing these staged changes. " +
@@ -53,7 +53,7 @@ class GitCommitService
             message.Equals("Ollama returned no response.", StringComparison.OrdinalIgnoreCase))
         {
             ConsoleError($"Could not generate a commit message: {message}");
-            return;
+            return false;
         }
 
         Console.WriteLine($"Commit message: {message}");
@@ -61,26 +61,11 @@ class GitCommitService
         if (commitResult.ExitCode != 0)
         {
             ConsoleError(commitResult.StandardError);
-            return;
-        }
-        
-        if (args.Contains("--push", StringComparer.Ordinal))
-        {
-            var pushResult = await RunGitAsync(repository, "push");
-            if (pushResult.ExitCode != 0)
-            {
-                ConsoleError(pushResult.StandardError);
-                return;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Push successful.");
-                Console.ResetColor();
-            }
+            return false;
         }
 
         Console.Write(commitResult.StandardOutput);
+        return true;
     }
 
     private static string? GetRepositoryPath(string[] args)
